@@ -135,7 +135,7 @@
     line-height: 1.7;
     white-space: pre-wrap;
     word-break: break-word;
-    max-height: 0;
+    max-height: 6.8em;
     overflow: hidden;
     transition: max-height 0.4s ease;
   }
@@ -427,6 +427,7 @@ function renderPrompts(prompts) {
 
   container.innerHTML = prompts.map(p => {
     const hasMore = p.content.length > 200;
+    // 展开全文按钮：如果内容超过 200 字符才显示
     const mdPath = p.md_file || '';
 
     return `
@@ -502,28 +503,27 @@ function toggleContent(id) {
   const isExpanded = el.classList.contains('expanded');
 
   if (isExpanded) {
-    // 收起：先设回当前实际高度触发 transition，再设到 0
+    // 收起：移除 expanded，恢复 4 行预览
     el.style.maxHeight = el.scrollHeight + 'px';
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
-        el.style.maxHeight = '0px';
         el.classList.remove('expanded');
+        el.style.maxHeight = '6.8em';
       });
     });
     if (triggerText) triggerText.textContent = '展开全文';
     if (triggerArrow) triggerArrow.classList.remove('up');
     if (collapseTop) collapseTop.classList.remove('show');
-    // 收起后滚动到卡片顶部
     const card = el.closest('.card');
     if (card) {
       card.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   } else {
-    // 展开：先显示内容获取实际高度，再设高度触发 transition
+    // 展开：添加 expanded，动画展开到完整高度
     el.classList.add('expanded');
     el.style.maxHeight = 'none';
     const h = el.scrollHeight;
-    el.style.maxHeight = '0px';
+    el.style.maxHeight = '6.8em';
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
         el.style.maxHeight = h + 'px';
