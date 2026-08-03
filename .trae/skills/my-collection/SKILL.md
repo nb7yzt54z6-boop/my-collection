@@ -1,13 +1,15 @@
 ---
-name: 我的收藏平台
-description: 管理「我的收藏」个人收藏平台的内容更新。当用户发送 MD 文件、网页链接，或提到"我的收藏"时自动触发，完成内容添加、截图、数据更新和 Git 推送。
+name: 我的工作台
+description: 管理「V的工作台」个人收藏平台的内容更新。当用户发送 MD 文件、网页链接，或提到"我的工作台"、"V的工作台"时自动触发，完成内容添加、截图、数据更新和 Git 推送。
 ---
 
-# 我的收藏平台
+# 我的工作台
 
 ## 描述
 
-这是一个用于管理「我的收藏」个人收藏平台的技能。该平台是一个基于 GitHub Pages 的静态网站，展示提示词（Prompts）和 HTML 网页（Webpages）两类内容。本技能负责接收用户提供的内容（MD 文件或链接），自动完成提取、截图、数据更新和 Git 推送的全流程。
+这是一个用于管理「V的工作台」个人收藏平台的技能。该平台是一个基于 GitHub Pages 的静态网站，展示提示词（Prompts）和 HTML 网页（Webpages）两类内容。本技能负责接收用户提供的内容（MD 文件或链接），自动完成提取、截图、数据更新和 Git 推送的全流程。
+
+> **重要原则**：做任何调整前（包括修改页面、更新内容、删除条目、更改配置等），都需要先跟用户确认需求，用户确认后再进行调整。
 
 ## 使用场景
 
@@ -16,7 +18,7 @@ description: 管理「我的收藏」个人收藏平台的内容更新。当用�
 1. 用户发送 `.md` 或 `.md` 文件
 2. 用户发送一个网页链接（URL）
 3. 用户同时发送 MD 文件 + 链接
-4. 用户明确提到"我的收藏"、"收藏平台"、"更新内容"等关键词
+4. 用户明确提到"我的工作台"、"V的工作台"、"工作台平台"、"更新内容"等关键词
 5. 用户说"修改某个内容"、"优化页面"等涉及平台管理的请求
 
 ## 平台信息
@@ -25,6 +27,7 @@ description: 管理「我的收藏」个人收藏平台的内容更新。当用�
 - **GitHub 仓库**：`https://github.com/nb7yzt54z6-boop/my-collection.git`
 - **工作目录**：`/workspace/personal-site/`
 - **Git 远程仓库**：`https://github.com/nb7yzt54z6-boop/my-collection.git`（远程已配置为 origin，直接 git push 即可）
+- **Skill 文件下载路径**：`https://raw.githubusercontent.com/nb7yzt54z6-boop/my-collection/main/.trae/skills/my-collection/SKILL.md`
 
 ## 仓库结构
 
@@ -42,7 +45,7 @@ personal-site/
 
 ```json
 {
-  "site_name": "我的收藏",
+  "site_name": "V的工作台",
   "prompts": [
     {
       "id": 1,
@@ -142,7 +145,7 @@ git push
 
 **优化页面**：修改 `index.html` 的 CSS/JS，推送后 GitHub Pages 自动更新。
 
-**初始化**：如果仓库不存在，则创建目录、index.html、data.json（初始结构：`{"site_name":"我的收藏","prompts":[],"webpages":[]}`）、docs/、screenshots/ 目录，初始化 Git 并推送。
+**初始化**：如果仓库不存在，则创建目录、index.html、data.json（初始结构：`{"site_name":"V的工作台","prompts":[],"webpages":[]}`）、docs/、screenshots/ 目录，初始化 Git 并推送。
 
 ## 详细参考
 

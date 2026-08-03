@@ -1,13 +1,15 @@
-# 我的收藏 · 个人收藏平台 Skill
+# V的工作台 · 个人收藏平台 Skill
 
 ## 一、平台概述
 
-**我的收藏** 是一个基于 GitHub Pages 的静态个人收藏平台，用于展示两类内容：
+**V的工作台** 是一个基于 GitHub Pages 的静态个人收藏平台，用于展示两类内容：
 - **提示词（Prompts）**：纯文本内容，可附带原始 Markdown 文件供下载
 - **HTML 网页（Webpages）**：带链接的工具/应用，展示截图预览和文字描述
 
 **访问地址**：`https://nb7yzt54z6-boop.github.io/my-collection/`
 **GitHub 仓库**：`https://github.com/nb7yzt54z6-boop/my-collection.git`
+
+> **重要原则**：做任何调整前（包括修改页面、更新内容、删除条目、更改配置等），都需要先跟用户确认需求，用户确认后再进行调整。
 
 ---
 
@@ -30,7 +32,7 @@ personal-site/
 
 ```json
 {
-  "site_name": "我的收藏",
+  "site_name": "V的工作台",
   "prompts": [
     {
       "id": 1,
@@ -80,7 +82,7 @@ personal-site/
 1. 用户发送 `.md` 或 `.md` 文件
 2. 用户发送一个网页链接（URL）
 3. 用户同时发送 MD 文件 + 链接
-4. 用户明确提到"我的收藏"、"收藏平台"或"更新内容"
+4. 用户明确提到"我的工作台"、"V的工作台"或"更新内容"
 
 ### 工作流 A：添加提示词（MD 文件）
 
@@ -233,7 +235,7 @@ git push
 ### 场景 3：用户同时发送 MD + 链接
 → 执行工作流 C（同时添加两个内容）
 
-### 场景 4：用户说"更新我的收藏"
+### 场景 4：用户说"更新我的工作台"
 → 确认用户要添加什么内容，引导用户提供 MD 文件或链接
 
 ### 场景 5：用户说"修改某个内容"
@@ -249,7 +251,7 @@ git push
 如果在新环境需要重新搭建，步骤：
 1. 创建目录 `personal-site/`
 2. 创建 `index.html`（参考现有完整 HTML）
-3. 创建 `data.json`（初始结构：`{"site_name":"我的收藏","prompts":[],"webpages":[]}`）
+3. 创建 `data.json`（初始结构：`{"site_name":"V的工作台","prompts":[],"webpages":[]}`）
 4. 创建 `docs/` 和 `screenshots/` 目录
 5. 初始化 Git 仓库 → 关联远程仓库 → 推送
 6. 在 GitHub 仓库设置中启用 Pages
@@ -259,5 +261,7 @@ git push
 ## 十、Skill 文件本身
 
 - 本文件路径：`/workspace/personal-site/my-collection-skill.md`
-- 在新对话中，用户提到"我的收藏"时，AI 应读取本文件了解平台逻辑
+- 在新对话中，用户提到"我的工作台"或"V的工作台"时，AI 应读取本文件了解平台逻辑
 - 本文件应随平台一起推送到 GitHub 仓库，确保永久可用
+- **Skill 主文件下载路径**：`https://raw.githubusercontent.com/nb7yzt54z6-boop/my-collection/main/.trae/skills/my-collection/SKILL.md`
+- **本参考文档下载路径**：`https://raw.githubusercontent.com/nb7yzt54z6-boop/my-collection/main/my-collection-skill.md`
