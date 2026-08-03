@@ -371,6 +371,212 @@
     transform: translateY(0) scale(0.92);
   }
 
+  /* ========== Overlay Modal（桌面端） ========== */
+  .content-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .content-modal.open { display: flex; }
+
+  .content-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+  }
+
+  .content-modal-panel {
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 85vh;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    animation: modalFadeIn 0.25s ease;
+    overflow: hidden;
+  }
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes modalFadeOut {
+    from { opacity: 1; transform: scale(1) translateY(0); }
+    to { opacity: 0; transform: scale(0.95) translateY(10px); }
+  }
+
+  .content-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.06);
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 10;
+  }
+
+  .content-modal-close:hover { background: rgba(0,0,0,0.12); }
+
+  .content-modal-body {
+    padding: 28px 24px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .content-modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    padding-right: 32px;
+  }
+
+  .content-modal-content {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .content-modal-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .content-modal-actions {
+    margin-top: 12px;
+  }
+
+  /* ========== Bottom Sheet（移动端） ========== */
+  .content-sheet {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .content-sheet.open { display: flex; }
+
+  .content-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
+
+  .content-sheet-panel {
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 16px 16px 0 0;
+    width: 100%;
+    max-height: 80vh;
+    box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    animation: sheetSlideUp 0.3s ease;
+    overflow: hidden;
+  }
+
+  @keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes sheetSlideDown {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+  }
+
+  .content-sheet-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0,0,0,0.15);
+    margin: 10px auto 4px;
+    flex-shrink: 0;
+  }
+
+  .content-sheet-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.06);
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+
+  .content-sheet-close:hover { background: rgba(0,0,0,0.12); }
+
+  .content-sheet-body {
+    padding: 16px 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .content-sheet-title {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    padding-right: 28px;
+  }
+
+  .content-sheet-content {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .content-sheet-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .content-sheet-actions {
+    margin-top: 10px;
+  }
+
   /* Responsive */
   @media (max-width: 600px) {
     .container { padding: 16px 10px; }
@@ -424,8 +630,38 @@
 <!-- 优化4：回到顶部按钮 -->
 <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="回到顶部">&#8593;</button>
 
+<!-- ========== Overlay Modal（桌面端） ========== -->
+<div id="contentModal" class="content-modal">
+  <div class="content-modal-backdrop" id="modalBackdrop"></div>
+  <div class="content-modal-panel">
+    <button class="content-modal-close" id="modalCloseBtn">&times;</button>
+    <div class="content-modal-body">
+      <div class="content-modal-title" id="modalTitle"></div>
+      <div class="content-modal-content" id="modalContent"></div>
+      <div class="content-modal-meta" id="modalMeta"></div>
+      <div class="content-modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Bottom Sheet（移动端） ========== -->
+<div id="contentSheet" class="content-sheet">
+  <div class="content-sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="content-sheet-panel">
+    <div class="content-sheet-handle"></div>
+    <button class="content-sheet-close" id="sheetCloseBtn">&times;</button>
+    <div class="content-sheet-body">
+      <div class="content-sheet-title" id="sheetTitle"></div>
+      <div class="content-sheet-content" id="sheetContent"></div>
+      <div class="content-sheet-meta" id="sheetMeta"></div>
+      <div class="content-sheet-actions" id="sheetActions"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 let data = null;
+let promptsData = [];
 
 async function loadData() {
   const containerPrompts = document.getElementById('tab-prompts');
@@ -446,6 +682,7 @@ async function loadData() {
 
 function renderPrompts(prompts) {
   const container = document.getElementById('tab-prompts');
+  promptsData = prompts;
 
   if (!prompts.length) {
     container.innerHTML = `
@@ -459,21 +696,17 @@ function renderPrompts(prompts) {
 
   container.innerHTML = '<div class="card-grid">' + prompts.map(p => {
     const hasMore = p.content.length > 200;
-    // 展开全文按钮：如果内容超过 200 字符才显示
     const mdPath = p.md_file || '';
 
     return `
       <div class="card">
         <div class="card-body">
           <div class="card-title">${escapeHtml(p.title)}</div>
+          <div class="card-content" id="content-${p.id}">${escapeHtml(p.content)}</div>
           ${hasMore ? `
-            <button class="collapse-top" id="collapseTop-${p.id}" onclick="toggleContent(${p.id})">&#8593; 收起全文</button>
-          ` : ''}
-          <div class="card-content ${hasMore ? '' : 'expanded'}" id="content-${p.id}">${escapeHtml(p.content)}</div>
-          ${hasMore ? `
-            <button class="card-content-trigger" id="trigger-${p.id}" onclick="toggleContent(${p.id})">
-              <span id="triggerText-${p.id}">展开全文</span>
-              <span class="arrow" id="triggerArrow-${p.id}">&#9660;</span>
+            <button class="card-content-trigger" id="trigger-${p.id}" onclick="openContentDetail(${p.id})">
+              <span>展开全文</span>
+              <span class="arrow">&#9660;</span>
             </button>
           ` : ''}
           <div class="card-meta">${p.created_at || ''}</div>
@@ -523,49 +756,98 @@ function renderWebpages(webpages) {
   }).join('') + '</div>';
 }
 
-function toggleContent(id) {
-  const el = document.getElementById('content-' + id);
-  const trigger = document.getElementById('trigger-' + id);
-  const triggerText = document.getElementById('triggerText-' + id);
-  const triggerArrow = document.getElementById('triggerArrow-' + id);
-  const collapseTop = document.getElementById('collapseTop-' + id);
+// ========== 内容展开：桌面端 Modal / 移动端 Bottom Sheet ==========
+let contentOpen = false;
 
-  if (!el) return;
+function openContentDetail(id) {
+  const p = promptsData.find(item => item.id === id);
+  if (!p) return;
 
-  const isExpanded = el.classList.contains('expanded');
+  const isMobile = window.innerWidth <= 600;
+  const mdPath = p.md_file || '';
+  const downloadBtn = mdPath
+    ? `<a class="btn btn-primary" href="${mdPath}" download target="_blank" rel="noopener">下载原文</a>`
+    : '';
 
-  if (isExpanded) {
-    // 收起：移除 expanded，恢复 4 行预览
-    el.style.maxHeight = el.scrollHeight + 'px';
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        el.classList.remove('expanded');
-        el.style.maxHeight = '6.8em';
-      });
-    });
-    if (triggerText) triggerText.textContent = '展开全文';
-    if (triggerArrow) triggerArrow.classList.remove('up');
-    if (collapseTop) collapseTop.classList.remove('show');
-    const card = el.closest('.card');
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  if (isMobile) {
+    // 移动端：Bottom Sheet
+    document.getElementById('sheetTitle').textContent = p.title;
+    document.getElementById('sheetContent').textContent = p.content;
+    document.getElementById('sheetMeta').textContent = p.created_at || '';
+    document.getElementById('sheetActions').innerHTML = downloadBtn;
+    document.getElementById('contentSheet').classList.add('open');
   } else {
-    // 展开：添加 expanded，动画展开到完整高度
-    el.classList.add('expanded');
-    el.style.maxHeight = 'none';
-    const h = el.scrollHeight;
-    el.style.maxHeight = '6.8em';
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        el.style.maxHeight = h + 'px';
-      });
-    });
-    if (triggerText) triggerText.textContent = '收起';
-    if (triggerArrow) triggerArrow.classList.add('up');
-    if (collapseTop) collapseTop.classList.add('show');
+    // 桌面端：Overlay Modal
+    document.getElementById('modalTitle').textContent = p.title;
+    document.getElementById('modalContent').textContent = p.content;
+    document.getElementById('modalMeta').textContent = p.created_at || '';
+    document.getElementById('modalActions').innerHTML = downloadBtn;
+    document.getElementById('contentModal').classList.add('open');
   }
+  document.body.style.overflow = 'hidden';
+  contentOpen = true;
 }
+
+function closeContentDetail() {
+  const modal = document.getElementById('contentModal');
+  const sheet = document.getElementById('contentSheet');
+  modal.classList.remove('open');
+  // 底部 sheet 滑动关闭动画
+  const sheetPanel = sheet.querySelector('.content-sheet-panel');
+  if (sheet.classList.contains('open')) {
+    sheetPanel.style.animation = 'sheetSlideDown 0.25s ease forwards';
+    setTimeout(function() {
+      sheet.classList.remove('open');
+      sheetPanel.style.animation = '';
+    }, 250);
+  }
+  document.body.style.overflow = '';
+  contentOpen = false;
+}
+
+// 点击遮罩关闭
+document.getElementById('modalBackdrop').addEventListener('click', closeContentDetail);
+document.getElementById('sheetBackdrop').addEventListener('click', closeContentDetail);
+
+// 点击 x 按钮关闭
+document.getElementById('modalCloseBtn').addEventListener('click', closeContentDetail);
+document.getElementById('sheetCloseBtn').addEventListener('click', closeContentDetail);
+
+// 拖拽底部 sheet 手柄关闭
+(function() {
+  let startY = 0, currentY = 0, isDragging = false;
+  const sheet = document.getElementById('contentSheet');
+  const panel = sheet.querySelector('.content-sheet-panel');
+  const handle = sheet.querySelector('.content-sheet-handle');
+
+  handle.addEventListener('touchstart', function(e) {
+    startY = e.touches[0].clientY;
+    isDragging = true;
+    panel.style.transition = 'none';
+  }, { passive: true });
+
+  handle.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    if (diff > 0) {
+      panel.style.transform = 'translateY(' + diff + 'px)';
+    }
+  }, { passive: true });
+
+  handle.addEventListener('touchend', function() {
+    if (!isDragging) return;
+    isDragging = false;
+    panel.style.transition = '';
+    panel.style.transform = '';
+    const diff = currentY - startY;
+    if (diff > 80) {
+      closeContentDetail();
+    }
+    startY = 0;
+    currentY = 0;
+  }, { passive: true });
+})();
 
 let viewerOpen = false;
 
@@ -618,7 +900,17 @@ window.addEventListener('scroll', function() {
 
 // Keyboard support
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeViewer();
+  if (e.key === 'Escape') {
+    if (contentOpen) {
+      closeContentDetail();
+    }
+    closeViewer();
+  }
+});
+
+// 窗口 resize 时自动关闭弹窗
+window.addEventListener('resize', function() {
+  if (contentOpen) closeContentDetail();
 });
 
 loadData();

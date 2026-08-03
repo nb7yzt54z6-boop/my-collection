@@ -151,31 +151,21 @@ git push
 
 ### 1. 内容预览展开/收起逻辑
 
-首页的内容卡片（prompts 提示词）使用预览模式，展开前只显示约 4 行文字，点击「展开全文」后展示全部内容。
+首页的内容卡片（prompts 提示词）使用预览模式，展开前只显示约 4 行文字，点击「展开全文」后弹出独立窗口展示全部内容。
 
-**CSS 实现（index.html）：**
-```css
-.card-content {
-  max-height: 6.8em;        /* 约 4 行文字 */
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.card-content.expanded {
-  max-height: none;          /* 展开后无高度限制 */
-}
-```
+**响应式设计：**
+- **桌面端（>600px）**：Overlay Modal — 居中弹窗，半透明遮罩，缩放入场动画
+- **移动端（≤600px）**：Bottom Sheet — 底部滑入面板，带拖拽手柄，支持手势关闭
 
-**HTML 结构：**
-- 内容由 `div.card-content` 包裹，默认 `max-height: 6.8em` 截断
-- 内容超过 200 字符时显示「展开全文」按钮（`card-content-trigger`）
-- 展开后顶部显示「收起全文」按钮（`collapse-top`）
-- 内容少于 200 字符时直接全部展示，不显示展开按钮
+**关键 JS 函数：**
+- `openContentDetail(id)` — 根据 `window.innerWidth` 判断使用 Modal 还是 Bottom Sheet
+- `closeContentDetail()` — 关闭当前弹窗，Bottom Sheet 带滑出动画
+- 支持 ESC 键、点击遮罩、点击 × 关闭
+- 弹窗打开时锁定 body 滚动
+- 窗口 resize 时自动关闭弹窗
+- 弹窗中显示完整内容 + 日期 + 下载原文按钮（如有 MD 文件）
 
-**JS 逻辑：** `toggleContent(id)` 函数通过切换 `expanded` 类控制展开/收起，使用双 `requestAnimationFrame` 实现平滑动画。
-
-**修改指引：** 如果需要对首页内容展示做类似「展开全文」的折叠效果，参考以上 CSS 类和 JS 函数实现。
+**修改指引：** 如果需要对首页内容展示做类似「展开全文」的弹窗效果，参考 `openContentDetail` 和 `closeContentDetail` 函数，以及 `.content-modal` / `.content-sheet` 系列的 CSS 类。
 
 ### 2. 图标系统（Emoji → SVG 替换规范）
 
