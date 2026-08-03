@@ -113,8 +113,8 @@
   /* Card Grid */
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
   }
 
   /* Card */
@@ -373,13 +373,28 @@
 
   /* Responsive */
   @media (max-width: 600px) {
-    .container { padding: 20px 16px; }
-    header h1 { font-size: 22px; }
-    .card-grid { grid-template-columns: 1fr; gap: 10px; }
-    .card-body { padding: 10px 12px; }
-    .card-title { font-size: 14px; }
-    .screenshot-wrapper { max-height: 180px; }
+    .container { padding: 16px 10px; }
+    header h1 { font-size: 20px; }
+    header { margin-bottom: 24px; }
+    .card-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .card-body { padding: 8px 10px; }
+    .card-title { font-size: 13px; }
+    .card-content { font-size: 12px; max-height: 3.6em; line-height: 1.4; }
+    .screenshot-wrapper { max-height: 140px; }
+    .btn { font-size: 11px; padding: 5px 10px; }
+    .card-meta { font-size: 10px; padding-top: 6px; }
+    .card-actions { gap: 4px; margin-top: 6px; }
     .back-to-top { bottom: 20px; right: 16px; }
+  }
+
+  @media (max-width: 380px) {
+    .container { padding: 12px 8px; }
+    .card-grid { gap: 6px; }
+    .card-body { padding: 6px 8px; }
+    .card-title { font-size: 12px; }
+    .card-content { font-size: 11px; max-height: 3em; }
+    .screenshot-wrapper { max-height: 110px; }
+    .btn { font-size: 10px; padding: 4px 8px; }
   }
 </style>
 </head>
