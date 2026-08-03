@@ -128,20 +128,68 @@
     line-height: 1.4;
   }
 
+  /* ========== 优化3：max-height 折叠展开 ========== */
   .card-content {
     font-size: 14px;
     color: var(--text-secondary);
     line-height: 1.7;
     white-space: pre-wrap;
     word-break: break-word;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
   }
 
-  .card-content.collapsed {
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  .card-content.expanded {
+    max-height: none;
   }
+
+  .card-content-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 0;
+    margin-top: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary);
+    border: none;
+    background: transparent;
+    width: 100%;
+    transition: opacity 0.2s;
+  }
+
+  .card-content-trigger:active { opacity: 0.6; }
+
+  .card-content-trigger .arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 12px;
+  }
+
+  .card-content-trigger .arrow.up { transform: rotate(180deg); }
+
+  /* ========== 优化3：顶部收起按钮 ========== */
+  .collapse-top {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 0 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary);
+    border: none;
+    background: transparent;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .collapse-top.show { display: flex; }
 
   .card-meta {
     font-size: 12px;
@@ -188,7 +236,7 @@
     border-color: var(--primary);
   }
 
-  /* Screenshot thumbnail */
+  /* ========== 优化1：渐进式图片加载 ========== */
   .screenshot-wrapper {
     position: relative;
     width: 100%;
@@ -203,28 +251,28 @@
     display: block;
     object-fit: cover;
     object-position: top;
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
 
-  .screenshot-overlay {
+  .screenshot-wrapper img.loaded {
+    opacity: 1;
+  }
+
+  .screenshot-wrapper .img-placeholder {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.03);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s;
+    background: linear-gradient(110deg, #eee 30%, #f8f8f8 50%, #eee 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
   }
 
-  .screenshot-wrapper:hover .screenshot-overlay { opacity: 1; }
-
-  .screenshot-overlay span {
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 13px;
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
+
+  .screenshot-wrapper img.loaded + .img-placeholder { display: none; }
 
   /* Full image viewer */
   .viewer-overlay {
@@ -273,6 +321,40 @@
     color: var(--text-secondary);
   }
 
+  /* ========== 优化4：回到顶部按钮 ========== */
+  .back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .back-to-top.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .back-to-top:active {
+    transform: translateY(0) scale(0.92);
+  }
+
   /* Responsive */
   @media (max-width: 600px) {
     .container { padding: 20px 16px; }
@@ -280,6 +362,7 @@
     .card-body { padding: 16px; }
     .card-title { font-size: 16px; }
     .screenshot-wrapper { max-height: 200px; }
+    .back-to-top { bottom: 20px; right: 16px; }
   }
 </style>
 </head>
@@ -305,6 +388,9 @@
   <button class="viewer-close" onclick="closeViewer()">&times;</button>
   <img id="viewerImage" src="" alt="">
 </div>
+
+<!-- 优化4：回到顶部按钮 -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="回到顶部">&#8593;</button>
 
 <script>
 let data = null;
@@ -340,7 +426,6 @@ function renderPrompts(prompts) {
   }
 
   container.innerHTML = prompts.map(p => {
-    const contentShort = p.content.length > 200 ? p.content.slice(0, 200) + '...' : p.content;
     const hasMore = p.content.length > 200;
     const mdPath = p.md_file || '';
 
@@ -348,11 +433,19 @@ function renderPrompts(prompts) {
       <div class="card">
         <div class="card-body">
           <div class="card-title">${escapeHtml(p.title)}</div>
-          <div class="card-content collapsed" id="content-${p.id}">${escapeHtml(p.content)}</div>
+          ${hasMore ? `
+            <button class="collapse-top" id="collapseTop-${p.id}" onclick="toggleContent(${p.id})">&#8593; 收起全文</button>
+          ` : ''}
+          <div class="card-content ${hasMore ? '' : 'expanded'}" id="content-${p.id}">${escapeHtml(p.content)}</div>
+          ${hasMore ? `
+            <button class="card-content-trigger" id="trigger-${p.id}" onclick="toggleContent(${p.id})">
+              <span id="triggerText-${p.id}">展开全文</span>
+              <span class="arrow" id="triggerArrow-${p.id}">&#9660;</span>
+            </button>
+          ` : ''}
           <div class="card-meta">${p.created_at || ''}</div>
           <div class="card-actions">
-            ${hasMore ? `<button class="btn btn-outline" onclick="toggleContent(${p.id})">展开全文</button>` : ''}
-            ${mdPath ? `<a class="btn btn-primary" href="${mdPath}" download>下载原文</a>` : ''}
+            ${mdPath ? `<a class="btn btn-primary" href="${mdPath}" download target="_blank" rel="noopener">下载原文</a>` : ''}
           </div>
         </div>
       </div>
@@ -380,16 +473,15 @@ function renderWebpages(webpages) {
       <div class="card">
         ${screenshotPath ? `
           <div class="screenshot-wrapper" onclick="openViewer('${screenshotPath}')">
-            <img src="${screenshotPath}" alt="${escapeHtml(w.title)}" loading="lazy">
-            <div class="screenshot-overlay"><span>点击查看原图</span></div>
+            <img src="${screenshotPath}" alt="${escapeHtml(w.title)}" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
+            <div class="img-placeholder"></div>
           </div>
         ` : ''}
         <div class="card-body">
           <div class="card-title">${escapeHtml(w.title)}</div>
-          <div class="card-content">${escapeHtml(w.description)}</div>
+          <div class="card-content expanded">${escapeHtml(w.description)}</div>
           <div class="card-meta">${w.created_at || ''}</div>
           <div class="card-actions">
-            ${screenshotPath ? `<button class="btn btn-outline" onclick="openViewer('${screenshotPath}')">查看截图</button>` : ''}
             <a class="btn btn-primary" href="${escapeHtml(w.url)}" target="_blank" rel="noopener">打开链接</a>
           </div>
         </div>
@@ -398,26 +490,64 @@ function renderWebpages(webpages) {
   }).join('');
 }
 
-let contentExpanded = {};
-
 function toggleContent(id) {
   const el = document.getElementById('content-' + id);
+  const trigger = document.getElementById('trigger-' + id);
+  const triggerText = document.getElementById('triggerText-' + id);
+  const triggerArrow = document.getElementById('triggerArrow-' + id);
+  const collapseTop = document.getElementById('collapseTop-' + id);
+
   if (!el) return;
-  const isCollapsed = el.classList.contains('collapsed');
-  el.classList.toggle('collapsed');
-  const btn = el.closest('.card-body').querySelector('.card-actions .btn-outline');
-  if (btn) btn.textContent = isCollapsed ? '收起' : '展开全文';
+
+  const isExpanded = el.classList.contains('expanded');
+
+  if (isExpanded) {
+    // 收起：先设回当前实际高度触发 transition，再设到 0
+    el.style.maxHeight = el.scrollHeight + 'px';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        el.style.maxHeight = '0px';
+        el.classList.remove('expanded');
+      });
+    });
+    if (triggerText) triggerText.textContent = '展开全文';
+    if (triggerArrow) triggerArrow.classList.remove('up');
+    if (collapseTop) collapseTop.classList.remove('show');
+    // 收起后滚动到卡片顶部
+    const card = el.closest('.card');
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } else {
+    // 展开：先显示内容获取实际高度，再设高度触发 transition
+    el.classList.add('expanded');
+    el.style.maxHeight = 'none';
+    const h = el.scrollHeight;
+    el.style.maxHeight = '0px';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        el.style.maxHeight = h + 'px';
+      });
+    });
+    if (triggerText) triggerText.textContent = '收起';
+    if (triggerArrow) triggerArrow.classList.add('up');
+    if (collapseTop) collapseTop.classList.add('show');
+  }
 }
+
+let viewerOpen = false;
 
 function openViewer(src) {
   document.getElementById('viewerImage').src = src;
   document.getElementById('imageViewer').classList.add('open');
   document.body.style.overflow = 'hidden';
+  viewerOpen = true;
 }
 
 function closeViewer() {
   document.getElementById('imageViewer').classList.remove('open');
   document.body.style.overflow = '';
+  viewerOpen = false;
 }
 
 function switchTab(tab) {
@@ -425,6 +555,8 @@ function switchTab(tab) {
   document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
+  // 切换标签时回到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function escapeHtml(str) {
@@ -434,7 +566,25 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// Keyboard support for viewer
+// 优化4：回到顶部按钮
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+let scrollTimer = null;
+window.addEventListener('scroll', function() {
+  if (scrollTimer) clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(function() {
+    const btn = document.getElementById('backToTop');
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  }, 100);
+});
+
+// Keyboard support
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeViewer();
 });
