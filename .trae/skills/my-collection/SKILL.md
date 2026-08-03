@@ -147,6 +147,65 @@ git push
 
 **初始化**：如果仓库不存在，则创建目录、index.html、data.json（初始结构：`{"site_name":"V的工作台","prompts":[],"webpages":[]}`）、docs/、screenshots/ 目录，初始化 Git 并推送。
 
+## UI/UX 规范
+
+### 1. 内容预览展开/收起逻辑
+
+首页的内容卡片（prompts 提示词）使用预览模式，展开前只显示约 4 行文字，点击「展开全文」后展示全部内容。
+
+**CSS 实现（index.html）：**
+```css
+.card-content {
+  max-height: 6.8em;        /* 约 4 行文字 */
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.card-content.expanded {
+  max-height: none;          /* 展开后无高度限制 */
+}
+```
+
+**HTML 结构：**
+- 内容由 `div.card-content` 包裹，默认 `max-height: 6.8em` 截断
+- 内容超过 200 字符时显示「展开全文」按钮（`card-content-trigger`）
+- 展开后顶部显示「收起全文」按钮（`collapse-top`）
+- 内容少于 200 字符时直接全部展示，不显示展开按钮
+
+**JS 逻辑：** `toggleContent(id)` 函数通过切换 `expanded` 类控制展开/收起，使用双 `requestAnimationFrame` 实现平滑动画。
+
+**修改指引：** 如果需要对首页内容展示做类似「展开全文」的折叠效果，参考以上 CSS 类和 JS 函数实现。
+
+### 2. 图标系统（Emoji → SVG 替换规范）
+
+截图环境中的 emoji 字体可能未正确渲染，导致显示为 `X` 方框。解决方案：将页面中的 emoji 图标全部替换为 SVG 矢量图标。
+
+**实现方式：**
+1. 定义一个 `ICONS` 对象，集中存储所有 SVG 图标字符串
+2. 定义一个 `icon(name)` 辅助函数，用于在模板字符串中引用图标
+3. 所有 SVG 使用 `currentColor` 继承父元素文本颜色
+
+**SVG 设计规范：**
+- `viewBox="0 0 24 24"`，统一的 24x24 坐标系
+- `stroke="currentColor"`，`fill="none"`，`stroke-width="2"`
+- 添加 `style="vertical-align:middle"` 确保与文本对齐
+
+**代码示例（dance-workbench 参考）：**
+```javascript
+const ICONS = {
+  play: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="vertical-align:middle"><polygon points="8 5 19 12 8 19 8 5"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  star: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  // ... 其他图标
+};
+function icon(name) { return ICONS[name] || ''; }
+```
+
+**使用方式：** 在模板字符串中通过 `\${icon('play')}` 引用，替代原来的 emoji 字符。
+
+**适用场景：** 所有需要截图展示的页面、需要跨平台稳定渲染的图标（避免 emoji 在不同系统/截图环境中显示不一致）。
+
 ## 详细参考
 
 更完整的平台逻辑说明（含 UI/UX 约定、Git 规范、常见场景等）请参考 `/workspace/personal-site/my-collection-skill.md` 文件。

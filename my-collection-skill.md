@@ -161,11 +161,17 @@ personal-site/
 
 ### 卡片样式（提示词）
 - 标题：18px 字体，加粗
-- 内容：14px，灰色文字，`max-height` 折叠展开
+- 内容：14px，灰色文字，`max-height: 6.8em` 折叠（约 4 行预览）
 - 内容超过 200 字符时显示"展开全文"按钮
 - 展开后顶部和底部都有"收起全文"按钮
 - 收起时自动滚动到卡片顶部
 - 底部显示日期和"下载原文"按钮（如有 MD 文件）
+
+**展开/收起实现细节：**
+- CSS：`.card-content` 默认 `max-height: 6.8em; overflow: hidden; transition: max-height 0.4s ease`
+- 展开时添加 `.expanded` 类，`max-height: none`
+- JS `toggleContent(id)` 函数通过双 `requestAnimationFrame` 实现平滑动画
+- 内容少于 200 字符时直接全部展示，不显示展开/收起按钮
 
 ### 卡片样式（网页）
 - 顶部：截图区域（`max-height: 260px`，移动端 200px）
@@ -173,6 +179,28 @@ personal-site/
 - 骨架屏 shimmer 动画占位
 - 点击图片可放大查看原图（全屏查看器）
 - 标题 + 描述文字 + 日期 + "打开链接"按钮
+
+### 图标系统（Emoji → SVG 替换）
+
+截图环境中的 emoji 字体可能无法正确渲染，显示为 `X` 方框。所有需要截图展示的页面应使用 SVG 矢量图标替代 emoji。
+
+**实现方式：**
+1. 定义 `ICONS` 对象集中存储所有 SVG 图标字符串
+2. 定义 `icon(name)` 辅助函数在模板中引用
+3. SVG 使用 `currentColor` 继承父元素文本颜色
+
+**SVG 规范：** `viewBox="0 0 24 24"`，`stroke="currentColor"`，`fill="none"`，`stroke-width="2"`，`style="vertical-align:middle"`
+
+**示例：**
+```javascript
+const ICONS = {
+  play: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" ...>...</svg>',
+  star: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" ...>...</svg>',
+};
+function icon(name) { return ICONS[name] || ''; }
+```
+
+**适用场景：** 所有需要截图展示的页面，避免 emoji 在不同系统/截图环境中显示不一致。
 
 ### 交互细节
 - 图片懒加载：`loading="lazy"` + `decoding="async"`
