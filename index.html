@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的收藏</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card-bg: #fff;
+    --text: #1d1d1f;
+    --text-secondary: #86868b;
+    --border: #e5e5ea;
+    --primary: #007aff;
+    --primary-hover: #0056cc;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-top: 6px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.04);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--card-bg);
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* Content */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+  }
+
+  .empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+
+  .empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .empty-state p { font-size: 14px; }
+
+  /* Card */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+
+  .card-body { padding: 20px; }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .card-content {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .card-content.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 12px;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: var(--primary-hover); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    background: rgba(0,122,255,0.06);
+    border-color: var(--primary);
+  }
+
+  /* Screenshot thumbnail */
+  .screenshot-wrapper {
+    position: relative;
+    width: 100%;
+    max-height: 260px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #f0f0f0;
+  }
+
+  .screenshot-wrapper img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .screenshot-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .screenshot-wrapper:hover .screenshot-overlay { opacity: 1; }
+
+  .screenshot-overlay span {
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  /* Full image viewer */
+  .viewer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.85);
+    cursor: zoom-out;
+  }
+
+  .viewer-overlay.open { display: flex; align-items: center; justify-content: center; }
+
+  .viewer-overlay img {
+    max-width: 95vw;
+    max-height: 95vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  }
+
+  .viewer-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .viewer-close:hover { background: rgba(255,255,255,0.3); }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { padding: 20px 16px; }
+    header h1 { font-size: 22px; }
+    .card-body { padding: 16px; }
+    .card-title { font-size: 16px; }
+    .screenshot-wrapper { max-height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1 id="siteTitle">我的收藏</h1>
+    <p id="siteDesc">个人收藏的提示词与网页工具</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="prompts" onclick="switchTab('prompts')">提示词</button>
+    <button class="tab-btn" data-tab="webpages" onclick="switchTab('webpages')">HTML 网页</button>
+  </div>
+
+  <div id="tab-prompts" class="tab-content active"></div>
+  <div id="tab-webpages" class="tab-content"></div>
+</div>
+
+<!-- Full image viewer -->
+<div id="imageViewer" class="viewer-overlay" onclick="closeViewer()">
+  <button class="viewer-close" onclick="closeViewer()">&times;</button>
+  <img id="viewerImage" src="" alt="">
+</div>
+
+<script>
+let data = null;
+
+async function loadData() {
+  const containerPrompts = document.getElementById('tab-prompts');
+  const containerWebpages = document.getElementById('tab-webpages');
+
+  try {
+    const res = await fetch('data.json');
+    data = await res.json();
+  } catch (e) {
+    containerPrompts.innerHTML = '<div class="empty-state"><p>数据加载失败</p></div>';
+    return;
+  }
+
+  document.getElementById('siteTitle').textContent = data.site_name || '我的收藏';
+  renderPrompts(data.prompts || []);
+  renderWebpages(data.webpages || []);
+}
+
+function renderPrompts(prompts) {
+  const container = document.getElementById('tab-prompts');
+
+  if (!prompts.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <h3>暂无提示词</h3>
+        <p>还没有收藏任何提示词</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = prompts.map(p => {
+    const contentShort = p.content.length > 200 ? p.content.slice(0, 200) + '...' : p.content;
+    const hasMore = p.content.length > 200;
+    const mdPath = p.md_file || '';
+
+    return `
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title">${escapeHtml(p.title)}</div>
+          <div class="card-content collapsed" id="content-${p.id}">${escapeHtml(p.content)}</div>
+          <div class="card-meta">${p.created_at || ''}</div>
+          <div class="card-actions">
+            ${hasMore ? `<button class="btn btn-outline" onclick="toggleContent(${p.id})">展开全文</button>` : ''}
+            ${mdPath ? `<a class="btn btn-primary" href="${mdPath}" download>下载原文</a>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderWebpages(webpages) {
+  const container = document.getElementById('tab-webpages');
+
+  if (!webpages.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <h3>暂无网页</h3>
+        <p>还没有收藏任何网页工具</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = webpages.map(w => {
+    const screenshotPath = w.screenshot || '';
+
+    return `
+      <div class="card">
+        ${screenshotPath ? `
+          <div class="screenshot-wrapper" onclick="openViewer('${screenshotPath}')">
+            <img src="${screenshotPath}" alt="${escapeHtml(w.title)}" loading="lazy">
+            <div class="screenshot-overlay"><span>点击查看原图</span></div>
+          </div>
+        ` : ''}
+        <div class="card-body">
+          <div class="card-title">${escapeHtml(w.title)}</div>
+          <div class="card-content">${escapeHtml(w.description)}</div>
+          <div class="card-meta">${w.created_at || ''}</div>
+          <div class="card-actions">
+            ${screenshotPath ? `<button class="btn btn-outline" onclick="openViewer('${screenshotPath}')">查看截图</button>` : ''}
+            <a class="btn btn-primary" href="${escapeHtml(w.url)}" target="_blank" rel="noopener">打开链接</a>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+let contentExpanded = {};
+
+function toggleContent(id) {
+  const el = document.getElementById('content-' + id);
+  if (!el) return;
+  const isCollapsed = el.classList.contains('collapsed');
+  el.classList.toggle('collapsed');
+  const btn = el.closest('.card-body').querySelector('.card-actions .btn-outline');
+  if (btn) btn.textContent = isCollapsed ? '收起' : '展开全文';
+}
+
+function openViewer(src) {
+  document.getElementById('viewerImage').src = src;
+  document.getElementById('imageViewer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeViewer() {
+  document.getElementById('imageViewer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Keyboard support for viewer
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeViewer();
+});
+
+loadData();
+</script>
+</body>
+</html>
