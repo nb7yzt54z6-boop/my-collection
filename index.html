@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的收藏</title>
+<title>V的工作台</title>
 <style>
   :root {
     --bg: #f5f5f7;
@@ -370,8 +370,8 @@
 
 <div class="container">
   <header>
-    <h1 id="siteTitle">我的收藏</h1>
-    <p id="siteDesc">V 的个人收藏平台 - 提示词与网页工具</p>
+    <h1 id="siteTitle">V的工作台</h1>
+    <p id="siteDesc">V 的工作台 - 提示词与网页工具</p>
   </header>
 
   <div class="tabs">
@@ -407,7 +407,7 @@ async function loadData() {
     return;
   }
 
-  document.getElementById('siteTitle').textContent = data.site_name || '我的收藏';
+  document.getElementById('siteTitle').textContent = data.site_name || 'V的工作台';
   renderPrompts(data.prompts || []);
   renderWebpages(data.webpages || []);
 }
